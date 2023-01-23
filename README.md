@@ -12,6 +12,13 @@ pip install pypomod
 
 ## Use case
 
+### How to use
+
+```bash
+# Run pomodoro timer. 20 minutes work timer, 5 minutes break timer and repeat 1 time.
+pomodoro -w 20 -b 5 -r
+```
+
 ### Demo
 
 ![screenshot](./assets/screenshot.png)
