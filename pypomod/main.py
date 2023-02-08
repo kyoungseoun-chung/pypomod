@@ -38,3 +38,8 @@ def main():
     args = parser.parse_args()
     clear_terminal()
     pomodoro(args.work_time, args.break_time, args.repeat)
+
+
+if __name__ == "__main__":
+    """Make the main function can be called when the script is run directly."""
+    main()

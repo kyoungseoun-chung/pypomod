@@ -20,12 +20,31 @@ BAR_LENGTH: int = 60
 POMODORO_COLOR_GRAD = ANSI.color_gradient(
     [71, 227, 255], [255, 99, 71], BAR_LENGTH
 )
+POMODORO_COLOR_GRAD_INV = ANSI.color_gradient(
+    [255, 99, 71], [71, 227, 255], BAR_LENGTH
+)
 """Progress bar color gradient. From light blue to tomato."""
 
 
 def banner() -> None:
     """Prints the pypomod banner."""
-    pass
+
+    color_tomato = ANSI.rgb_to_ansi(255, 99, 71)
+
+    banner_text = """
+██▓███   ▒█████   ███▄ ▄███▓ ▒█████  ▓█████▄  ▒█████   ██▀███   ▒█████
+▓██░  ██▒▒██▒  ██▒▓██▒▀█▀ ██▒▒██▒  ██▒▒██▀ ██▌▒██▒  ██▒▓██ ▒ ██▒▒██▒  ██▒
+▓██░ ██▓▒▒██░  ██▒▓██    ▓██░▒██░  ██▒░██   █▌▒██░  ██▒▓██ ░▄█ ▒▒██░  ██▒
+▒██▄█▓▒ ▒▒██   ██░▒██    ▒██ ▒██   ██░░▓█▄   ▌▒██   ██░▒██▀▀█▄  ▒██   ██░
+▒██▒ ░  ░░ ████▓▒░▒██▒   ░██▒░ ████▓▒░░▒████▓ ░ ████▓▒░░██▓ ▒██▒░ ████▓▒░
+▒▓▒░ ░  ░░ ▒░▒░▒░ ░ ▒░   ░  ░░ ▒░▒░▒░  ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒▓ ░▒▓░░ ▒░▒░▒░
+░▒ ░       ░ ▒ ▒░ ░  ░      ░  ░ ▒ ▒░  ░ ▒  ▒   ░ ▒ ▒░   ░▒ ░ ▒░  ░ ▒ ▒░
+░░       ░ ░ ░ ▒  ░      ░   ░ ░ ░ ▒   ░ ░  ░ ░ ░ ░ ▒    ░░   ░ ░ ░ ░ ▒
+            ░ ░         ░       ░ ░     ░        ░ ░     ░         ░ ░
+                                    ░
+    """
+
+    print(f"{color_tomato}{banner_text}{ANSI.END}")
 
 
 def pomodoro(work_time: int, break_time: int, repeat: int) -> None:
@@ -37,8 +56,10 @@ def pomodoro(work_time: int, break_time: int, repeat: int) -> None:
         repeat (int): Number of repeats.
     """
 
-    work_now: bool = True
-    break_now: bool = False
+    work_now = True
+    break_now = False
+
+    banner()
 
     for i in range(repeat):
 
@@ -56,58 +77,76 @@ def pomodoro(work_time: int, break_time: int, repeat: int) -> None:
             print(
                 f"{i+1}/{repeat}: {ANSI.BLUE}Now take a break!{ANSI.END} {Emoji.WIND}",
             )
-            progress(break_time * 60)
+            progress(break_time * 60, grad_inv=True)
             clear_line(1)
             Notification.notify("Pomodoro", "Time to work!")
             time.sleep(0.2)
             break_now = False
             work_now = True
 
+    print(f"{Emoji.CHECK} {ANSI.GREEN}Well done!{ANSI.END} ")
 
-def progress(time_remain: int) -> None:
-    """Progress tracker.
 
-    Layout:
-        Current time | Remaining time
-        Progress bar | Percentage
+def progress(time_target: int, grad_inv: bool = False) -> None:
+    """Progress tracker
+
+    Args:
+        time_target (int): Target time in seconds.
+        grad_inv (bool, optional): Use inverted color gradient. Defaults to False.
     """
-    time_sec = time_remain
+
+    itr: int = 0
+    finished: bool = False
+
+    second_per_bar = int(round(time_target / float(BAR_LENGTH), 1))
+    second_per_step = second_per_bar / len(BARS)
 
     gradient = "|"
 
-    for t in range(BAR_LENGTH):
+    tri_emoji = next(Emoji.TRIATHLON)
 
-        percentage = int(round(100.0 * t / float(BAR_LENGTH - 1), 1))
+    target_tic = time.perf_counter()
+    tic = time.perf_counter()
 
-        second_per_bar = int(round(time_remain / float(BAR_LENGTH), 1))
-        second_per_step = second_per_bar / len(BARS)
+    if grad_inv is False:
+        color_grad = POMODORO_COLOR_GRAD
+    else:
+        color_grad = POMODORO_COLOR_GRAD_INV
 
-        tic = time.perf_counter()
+    while finished is False:
 
+        percentage = int(round(100.0 * itr / float(BAR_LENGTH - 1), 1))
+
+        toc = time.perf_counter()
         transition = ""
+        bar_adj = 1
 
-        tri_emoji = next(Emoji.TRIATHLON)
-        for b in BARS:
+        if toc - tic >= second_per_step:
 
-            mins, secs = divmod(time_sec, 60)
+            mins, secs = divmod(
+                abs(time_target - (time.perf_counter() - target_tic)), 60
+            )
             remaining_time = f"{int(mins):02d}m{int(secs):02d}s"
-            current_time = datetime.now().strftime("%H:%M:%S")
+            current_time = datetime.now().strftime("%H:%M")
             time_display = f"{current_time} - {remaining_time} {tri_emoji}"
 
-            transition = f"{POMODORO_COLOR_GRAD[t]}{b}{ANSI.END}"
+            bar_el = next(BAR_ITR)
+            transition = f"{color_grad[itr]}{bar_el}{ANSI.END}"
             bar = (
                 f"{time_display}\n\r{gradient + transition}"
-                + CDOT * (BAR_LENGTH - t - 1)
+                + CDOT * (BAR_LENGTH - itr - bar_adj)
                 + "|"
             )
-            print(bar + f" {percentage:01d} %  ", end="\r")
+            print(bar + f" {percentage:01d} % done! ", end="\r")
             clear_line(1)
-            time.sleep(second_per_step)
 
-            toc = time.perf_counter()
+            # Update new time check
+            tic = time.perf_counter()
 
-            if time.perf_counter() - tic >= 1:
-                time_sec -= toc - tic
-                tic = time.perf_counter()
+            if bar_el == "█":
+                tri_emoji = next(Emoji.TRIATHLON)
+                gradient += transition
+                itr += 1
 
-        gradient += transition
+        if percentage > 100:
+            finished = True

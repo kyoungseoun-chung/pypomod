@@ -65,6 +65,7 @@ class Emoji:
 
     FIRE: str = "🔥"
     WIND: str = "🏖️"
+    CHECK: str = "✅"
     TRIATHLON = cycle(["🏊", "🚴", "🏃"])
 
 
