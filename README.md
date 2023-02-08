@@ -42,7 +42,6 @@ options:
                         Set the number of repeats. Default is 1.
 ```
 
-## Known issue
+## WIP
 
-- [ ] Remaining time is not updated by a second.
 - [ ] Linux and Windows are not fully supported yet.
