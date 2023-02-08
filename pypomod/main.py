@@ -4,8 +4,6 @@ import argparse
 from pypomod.pomodoro import pomodoro
 from pypomod.tools import clear_terminal
 
-__version__ = "0.0.1"
-
 parser = argparse.ArgumentParser(
     prog="pympod",
     description="A simple python CLI package for the pomodoro timer.",

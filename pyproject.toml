@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pypomod"
-version = "0.0.1"
+version = "0.1.0"
 description = "Simple Python CLI package for Pomodoro timer."
 authors = ["Kyoungseoun Chung <kyoungseoun.chung@gmail.com>"]
 readme = "README.md"

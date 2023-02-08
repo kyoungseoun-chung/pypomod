@@ -5,6 +5,7 @@ from collections.abc import Iterable
 from datetime import datetime
 from itertools import cycle
 
+from pypomod import __version__
 from pypomod.tools import ANSI
 from pypomod.tools import clear_line
 from pypomod.tools import Emoji
@@ -31,7 +32,7 @@ def banner() -> None:
 
     color_tomato = ANSI.rgb_to_ansi(255, 99, 71)
 
-    banner_text = """
+    banner_text = f"""
  ██▓███   ▒█████   ███▄ ▄███▓ ▒█████  ▓█████▄  ▒█████   ██▀███   ▒█████
  ▓██░  ██▒▒██▒  ██▒▓██▒▀█▀ ██▒▒██▒  ██▒▒██▀ ██▌▒██▒  ██▒▓██ ▒ ██▒▒██▒  ██▒
  ▓██░ ██▓▒▒██░  ██▒▓██    ▓██░▒██░  ██▒░██   █▌▒██░  ██▒▓██ ░▄█ ▒▒██░  ██▒
@@ -42,6 +43,7 @@ def banner() -> None:
  ░░       ░ ░ ░ ▒  ░      ░   ░ ░ ░ ▒   ░ ░  ░ ░ ░ ░ ▒    ░░   ░ ░ ░ ░ ▒
              ░ ░         ░       ░ ░     ░        ░ ░     ░         ░ ░
                                      ░
+ v{__version__}
     """
 
     print(f"{color_tomato}{banner_text}{ANSI.END}")
